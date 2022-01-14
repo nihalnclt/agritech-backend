@@ -7,10 +7,12 @@ module.exports = {
     createUser: async (req, res) => {
         try {
             const newUser = new User(req.body);
+            const token = await newUser.generateAuthToken();
+            newUser.token = token;
             await newUser
                 .save()
                 .then((response) => {
-                    res.status(201).json(response);
+                    res.status(201).json({ user: response, token });
                 })
                 .catch((err) => {
                     // handling same email address error
@@ -50,7 +52,11 @@ module.exports = {
                 return sendErrorResponse(res, 404, 'Invalid email or password');
             }
 
-            return res.status(200).send(user);
+            const token = await user.generateAuthToken();
+            user.token = token;
+            await user.save();
+
+            return res.status(200).json({ user, token });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
