@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "agritech",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
@@ -12,10 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^11.0.0",
     "express": "^4.17.2",
     "mongoose": "^6.1.6",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "validator": "^13.7.0"
   }
 }
