@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 
-const sendErrorResponse = require('../helpers/sendErrorResponse');
-const User = require('../models/user.model');
+const { sendErrorResponse } = require('../helpers');
+const { User } = require('../models');
 
 module.exports = {
     createUser: async (req, res) => {
@@ -35,7 +35,7 @@ module.exports = {
             if (!req.body.email || !req.body.password) {
                 return sendErrorResponse(
                     res,
-                    404,
+                    400,
                     'Email id and password is required'
                 );
             }
