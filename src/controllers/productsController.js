@@ -1,6 +1,4 @@
-const ObjectId = require('mongoose').Types.ObjectId;
-
-const { sendErrorResponse } = require('../helpers');
+const { sendErrorResponse, checkValidObjectId } = require('../helpers');
 const { Product, Category } = require('../models');
 
 module.exports = {
@@ -24,8 +22,8 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            if (!ObjectId.isValid(id)) {
-                return sendErrorResponse(res, 404, 'No products found');
+            if (!checkValidObjectId(id)) {
+                return sendErrorResponse(res, 400, 'Invalid object id');
             }
 
             const product = await Product.findOneAndRemove({ _id: id });
@@ -40,7 +38,7 @@ module.exports = {
         }
     },
 
-    // /products?skip=3&sort=price:desc&category=fruits&maxprice=1000
+    // - /products?skip=3&sort=price:desc&category=fruits&maxprice=1000
     getAllProducts: async (req, res) => {
         try {
             const sort = {};
@@ -79,19 +77,16 @@ module.exports = {
             const skip = req.query.skip || 0;
 
             const products = await Product.find({})
-                .populate('category')
                 .sort(sort)
                 .skip(perPage * skip)
-                .limit(perPage);
+                .limit(perPage)
+                .select('_id name thumbnail price');
 
             if (products.length < 1) {
                 return sendErrorResponse(res, 404, 'No Products found');
             }
 
-            const count = await Product.find(filters)
-                .populate('category')
-                .sort(sort)
-                .count();
+            const count = await Product.find(filters).sort(sort).count();
 
             res.status(200).json({
                 products,
@@ -108,8 +103,8 @@ module.exports = {
         try {
             const { id } = req.params;
 
-            if (!ObjectId.isValid(id)) {
-                return sendErrorResponse(res, 404, 'No products found');
+            if (!checkValidObjectId(id)) {
+                return sendErrorResponse(res, 400, 'Invalid object id');
             }
 
             const product = await Product.findById(id).populate('category');
