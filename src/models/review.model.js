@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 
 const reviewSchema = new Schema(
     {
-        user: {
+        userId: {
             type: Schema.Types.ObjectId,
             required: true,
             ref: 'User',
         },
-        product: {
+        productId: {
             type: Schema.Types.ObjectId,
             required: true,
             ref: 'Product',
@@ -22,7 +22,7 @@ const reviewSchema = new Schema(
         stars: {
             type: Number,
             required: true,
-            min: 0,
+            min: 1,
             max: 5,
         },
     },

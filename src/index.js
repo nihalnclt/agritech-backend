@@ -3,7 +3,12 @@ const cors = require('cors');
 require('dotenv').config();
 
 require('./config/databaseConfig');
-const { usersRouter, productsRouter, categoriesRouter } = require('./routes');
+const {
+    usersRouter,
+    productsRouter,
+    categoriesRouter,
+    reviewsRouter,
+} = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +23,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/products', productsRouter);
 app.use('/api/v1/categories', categoriesRouter);
+app.use('/api/v1/reviews', reviewsRouter);
 
 app.listen(PORT, () => {
     console.log(`server is up on port ${PORT}`);
