@@ -27,6 +27,9 @@ module.exports = {
             const newReview = new Review(req.body);
             await newReview.save();
 
+            product.reviews.push(newReview._id);
+            await product.save();
+
             res.status(201).json(newReview);
         } catch (err) {
             sendErrorResponse(res, 500, err);
