@@ -8,7 +8,7 @@ const productSchema = new Schema({
         required: true,
         trim: true,
     },
-    slug: {
+    shortDescription: {
         type: String,
         required: true,
         trim: true,
