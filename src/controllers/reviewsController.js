@@ -27,25 +27,7 @@ module.exports = {
             const newReview = new Review(req.body);
             await newReview.save();
 
-            product.reviews.push(newReview._id);
-            await product.save();
-
             res.status(201).json(newReview);
-        } catch (err) {
-            sendErrorResponse(res, 500, err);
-        }
-    },
-
-    getReviews: async (req, res) => {
-        try {
-            const { productId } = req.params;
-
-            if (!checkValidObjectId(productId)) {
-                return sendErrorResponse(res, 400, 'Invalid product id');
-            }
-
-            const reviews = await Review.find({ productId: productId });
-            res.status(200).json(reviews);
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Review = require('./review.model');
 
 const { Schema } = mongoose;
 
@@ -46,12 +47,17 @@ const productSchema = new Schema({
             type: String,
         },
     ],
-    reviews: [
-        {
-            type: mongoose.Schema.Types.ObjectID,
-            ref: 'Review',
-        },
-    ],
+});
+
+// deleting reviews that is related to removed product
+productSchema.pre('remove', async function (next) {
+    try {
+        const product = this;
+        await Review.deleteMany({ productId: product._id });
+        next();
+    } catch (err) {
+        next(new Error(err));
+    }
 });
 
 const Product = mongoose.model('Product', productSchema);
