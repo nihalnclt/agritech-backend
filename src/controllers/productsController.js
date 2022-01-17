@@ -20,28 +20,6 @@ module.exports = {
         }
     },
 
-    deleteProduct: async (req, res) => {
-        try {
-            const { id } = req.params;
-
-            if (!checkValidObjectId(id)) {
-                return sendErrorResponse(res, 400, 'Invalid object id');
-            }
-
-            const product = await Product.findOne({ _id: id });
-
-            if (!product) {
-                return sendErrorResponse(res, 404, 'No products found');
-            }
-
-            await product.remove();
-
-            res.status(200).json({ message: 'product successfully deleted' });
-        } catch (err) {
-            sendErrorResponse(res, 500, err);
-        }
-    },
-
     // - /products?skip=3&limit=10&sort=price:desc&category=fruits&maxprice=1000
     getAllProducts: async (req, res) => {
         try {
@@ -185,6 +163,48 @@ module.exports = {
             }
 
             res.status(200).json(product[0]);
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    updateProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (!checkValidObjectId(id)) {
+                return sendErrorResponse(res, 400, 'Invalid object id');
+            }
+
+            const product = await Product.findByIdAndUpdate(id, req.body);
+
+            if (!product) {
+                return sendErrorResponse(res, 404, 'No products found');
+            }
+
+            res.status(200).json({ message: 'product updated suucessfully' });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    deleteProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (!checkValidObjectId(id)) {
+                return sendErrorResponse(res, 400, 'Invalid object id');
+            }
+
+            const product = await Product.findOne({ _id: id });
+
+            if (!product) {
+                return sendErrorResponse(res, 404, 'No products found');
+            }
+
+            await product.remove();
+
+            res.status(200).json({ message: 'product successfully deleted' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
