@@ -61,4 +61,18 @@ module.exports = {
             sendErrorResponse(res, 500, err);
         }
     },
+
+    updateUser: async (req, res) => {
+        try {
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        try {
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
 };
