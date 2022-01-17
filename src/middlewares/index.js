@@ -1,3 +1,4 @@
-const userAuth = require('./userAuth');
+const auth = require('./auth');
+const isAdmin = require('./isAdmin');
 
-module.exports = { userAuth };
+module.exports = { auth, isAdmin };

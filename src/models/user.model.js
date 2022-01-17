@@ -41,6 +41,14 @@ const userSchema = new Schema({
             }
         },
     },
+    avatar: {
+        type: String,
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+    },
     token: {
         type: String,
         required: true,

@@ -6,7 +6,7 @@ const { User } = require('../models');
 module.exports = {
     createUser: async (req, res) => {
         try {
-            const newUser = new User(req.body);
+            const newUser = new User({ ...req.body, role: 'user' });
             const token = await newUser.generateAuthToken();
             newUser.token = token;
             await newUser
@@ -62,8 +62,49 @@ module.exports = {
         }
     },
 
+    // https://localhost:500/api/v1/users?search=nihal&skip=3
+    getAllUsers: async (req, res) => {
+        try {
+            const filters = {};
+
+            if (req.query.search) {
+                filters.fname = req.query.search;
+            }
+
+            const usersPerPage = 12;
+            const skip = parseInt(req.query.skip) || 0;
+
+            const users = await User.find(filters)
+                .limit(usersPerPage)
+                .skip(usersPerPage * skip);
+
+            const totalUsers = await User.find(filters).count();
+
+            res.status(200).json({ users, skip, usersPerPage, totalUsers });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
     updateUser: async (req, res) => {
         try {
+            const updates = Object.keys(req.body);
+            const allowedUpdates = ['fname', 'lname', 'email', 'avatar'];
+
+            if (!updates.every((update) => allowedUpdates.includes(update))) {
+                return sendErrorResponse(
+                    res,
+                    400,
+                    `you can only update ${allowedUpdates}`
+                );
+            }
+
+            updates.forEach((update) => {
+                req.user[update] = req.body[update];
+            });
+
+            await req.user.save();
+            res.status(200).json(req.user);
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
@@ -71,6 +112,8 @@ module.exports = {
 
     deleteUser: async (req, res) => {
         try {
+            await req.user.remove();
+            res.status(200).json({ message: 'user successfully deleted' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

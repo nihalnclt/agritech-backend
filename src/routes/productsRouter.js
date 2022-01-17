@@ -7,11 +7,11 @@ const {
     getSingleProduct,
     updateProduct,
 } = require('../controllers/productsController');
-const { userAuth } = require('../middlewares');
+const { isAdmin, auth } = require('../middlewares');
 
 router.post('', addProduct);
 router.get('/', getAllProducts);
-router.get('/:id', userAuth, getSingleProduct);
+router.get('/:id', auth, isAdmin, getSingleProduct);
 router.patch('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
 
