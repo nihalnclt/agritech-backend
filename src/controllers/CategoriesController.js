@@ -69,4 +69,28 @@ module.exports = {
             sendErrorResponse(res, 500, err);
         }
     },
+
+    getAllCategories: async (req, res) => {
+        try {
+            const categories = await Category.aggregate([
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: '_id',
+                        foreignField: 'category',
+                        as: 'products',
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        count: { $size: '$products' },
+                    },
+                },
+            ]);
+            res.status(200).json(categories);
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
 };
