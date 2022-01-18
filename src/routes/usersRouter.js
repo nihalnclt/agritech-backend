@@ -4,8 +4,9 @@ const {
     createUser,
     loginUser,
     updateUser,
-    deleteUser,
+    deleteOwnAccount,
     getAllUsers,
+    deleteUser,
 } = require('../controllers/usersController');
 const { auth } = require('../middlewares');
 
@@ -13,6 +14,7 @@ router.get('', getAllUsers);
 router.post('', createUser);
 router.post('/login', loginUser);
 router.patch('/', auth, updateUser);
-router.delete('/', auth, deleteUser);
+router.delete('/', auth, deleteOwnAccount);
+router.delete('/:id', deleteUser);
 
 module.exports = router;

@@ -8,6 +8,7 @@ const {
     productsRouter,
     categoriesRouter,
     reviewsRouter,
+    cartRouter,
 } = require('./routes');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/products', productsRouter);
 app.use('/api/v1/categories', categoriesRouter);
 app.use('/api/v1/reviews', reviewsRouter);
+app.use('/api/v1/cart', cartRouter);
 
 app.listen(PORT, () => {
     console.log(`server is up on port ${PORT}`);

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const { sendErrorResponse } = require('../helpers');
+const { sendErrorResponse, checkValidObjectId } = require('../helpers');
 const { User } = require('../models');
 
 module.exports = {
@@ -44,12 +44,12 @@ module.exports = {
 
             const user = await User.findOne({ email: email });
             if (!user) {
-                return sendErrorResponse(res, 404, 'Invalid email or password');
+                return sendErrorResponse(res, 400, 'Invalid email or password');
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return sendErrorResponse(res, 404, 'Invalid email or password');
+                return sendErrorResponse(res, 400, 'Invalid email or password');
             }
 
             const token = await user.generateAuthToken();
@@ -110,10 +110,30 @@ module.exports = {
         }
     },
 
-    deleteUser: async (req, res) => {
+    deleteOwnAccount: async (req, res) => {
         try {
             await req.user.remove();
             res.status(200).json({ message: 'user successfully deleted' });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (!checkValidObjectId(id)) {
+                return sendErrorResponse(res, 400, 'Invalid object id');
+            }
+
+            const user = await User.findByIdAndRemove(id);
+
+            if (!user) {
+                return sendErrorResponse(res, 404, 'User not found');
+            }
+
+            res.status(200).json({ message: 'user deleted successfully' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

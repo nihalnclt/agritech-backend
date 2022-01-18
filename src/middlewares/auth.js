@@ -5,6 +5,12 @@ const { sendErrorResponse } = require('../helpers');
 
 const userAuth = async (req, res, next) => {
     try {
+        if (
+            req.header('Authorization') === undefined ||
+            req.header('Authorization').split(' ')[1] === 'undefined'
+        ) {
+            return sendErrorResponse(res, 401, 'Token must be provided');
+        }
         const token = req.header('Authorization').split(' ')[1];
         const decoded = jwt.verify(token, 'secret');
 
