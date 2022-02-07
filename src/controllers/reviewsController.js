@@ -24,10 +24,22 @@ module.exports = {
                 );
             }
 
-            const newReview = new Review(req.body);
+            const newReview = new Review({ ...req.body, userId: req.user._id });
             await newReview.save();
 
             res.status(201).json(newReview);
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    getAllReviews: async (req, res) => {
+        try {
+            const reviews = await Review.find({
+                productId: req.params.productId,
+            }).populate('userId');
+
+            res.status(200).json(reviews);
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

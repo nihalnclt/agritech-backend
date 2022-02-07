@@ -195,7 +195,7 @@ module.exports = {
             );
 
             if (!cart) {
-                sendErrorResponse(res, 400, 'cart not found');
+                return sendErrorResponse(res, 400, 'cart not found');
             }
 
             res.status(200).json({ message: 'product quantity incremented' });
@@ -220,7 +220,7 @@ module.exports = {
             );
 
             if (!cart) {
-                sendErrorResponse(res, 400, 'cart not found');
+                return sendErrorResponse(res, 400, 'cart not found');
             }
 
             res.status(200).json({ message: 'product quantity decremented' });
@@ -242,10 +242,20 @@ module.exports = {
             );
 
             if (!cart) {
-                sendErrorResponse(res, 400, 'cart not found');
+                return sendErrorResponse(res, 400, 'cart not found');
             }
 
-            res.status(200).json(cart);
+            res.status(200).json({ message: 'cart item deleted' });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    clearCart: async (req, res) => {
+        try {
+            await Cart.findOneAndRemove({ user: req.user._id });
+
+            res.status(200).json({ message: 'cart cleared' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

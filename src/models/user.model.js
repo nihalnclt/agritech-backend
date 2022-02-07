@@ -18,8 +18,7 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
-        trim: true,
+        index: { unique: true },
         lowercase: true,
         validate(value) {
             if (!validator.isEmail(value)) {
@@ -51,9 +50,18 @@ const userSchema = new Schema({
     },
     token: {
         type: String,
-        required: true,
     },
 });
+
+userSchema.methods.toJSON = function () {
+    const user = this;
+    const userObj = user.toObject();
+
+    delete userObj.password;
+    delete userObj.token;
+
+    return userObj;
+};
 
 // generating jsonwebtoken
 userSchema.methods.generateAuthToken = async function () {
@@ -62,6 +70,10 @@ userSchema.methods.generateAuthToken = async function () {
         const token = jwt.sign({ _id: user._id.toString() }, 'secret', {
             expiresIn: '7d',
         });
+
+        user.token = token;
+        await user.save();
+
         return token;
     } catch (err) {
         throw new Error(err?.message);

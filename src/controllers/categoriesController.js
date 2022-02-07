@@ -32,13 +32,15 @@ module.exports = {
                 return sendErrorResponse(res, 400, 'Invalid object id');
             }
 
-            const category = await Category.findByIdAndUpdate(id, req.body);
+            const category = await Category.findByIdAndUpdate(id, req.body, {
+                new: true,
+            });
 
             if (!category) {
                 return sendErrorResponse(res, 404, 'No category found');
             }
 
-            res.status(200).json({ message: 'Category updated successfully' });
+            res.status(200).json(category);
         } catch (err) {
             if (err.code === 11000) {
                 return sendErrorResponse(
@@ -84,8 +86,12 @@ module.exports = {
                 {
                     $project: {
                         name: 1,
+                        icon: 1,
                         count: { $size: '$products' },
                     },
+                },
+                {
+                    $sort: { count: -1 },
                 },
             ]);
             res.status(200).json(categories);

@@ -7,14 +7,16 @@ const {
     deleteOwnAccount,
     getAllUsers,
     deleteUser,
+    getUser,
 } = require('../controllers/usersController');
-const { auth } = require('../middlewares');
+const { auth, isAdmin } = require('../middlewares');
 
-router.get('', getAllUsers);
+router.get('', auth, getUser);
+router.get('/all', auth, isAdmin, getAllUsers);
 router.post('', createUser);
 router.post('/login', loginUser);
 router.patch('/', auth, updateUser);
 router.delete('/', auth, deleteOwnAccount);
-router.delete('/:id', deleteUser);
+router.delete('/:id', auth, isAdmin, deleteUser);
 
 module.exports = router;

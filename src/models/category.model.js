@@ -8,7 +8,7 @@ const categorySchema = new Schema({
         required: true,
         trim: true,
         lowercase: true,
-        unique: true,
+        index: { unique: true },
     },
     icon: {
         type: String,

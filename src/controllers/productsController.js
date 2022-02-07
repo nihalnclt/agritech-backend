@@ -10,7 +10,15 @@ module.exports = {
             await newProduct
                 .save()
                 .then((response) => {
-                    res.status(201).json(response);
+                    const rspObj = response.toObject();
+
+                    delete rspObj.description;
+                    delete rspObj.category;
+                    delete rspObj.imagesPath;
+                    delete rspObj.shortDescription;
+                    delete rspObj.unit;
+
+                    res.status(201).json(rspObj);
                 })
                 .catch((err) => {
                     sendErrorResponse(res, 400, err);
@@ -28,22 +36,14 @@ module.exports = {
 
             // &sort=price:desc
             // &sort=name:desc
-            if (req.query.sort) {
+            if (req.query.sort && req.query.sort !== 'default') {
                 const parts = req.query.sort.split(':');
                 sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
             }
 
             // &category=categoryname
-            if (req.query.category) {
-                const category = await Category.findOne({
-                    name: req.query.category,
-                });
-
-                if (!category) {
-                    return sendErrorResponse(res, 404, 'No Products found');
-                }
-
-                filters.category = category._id;
+            if (req.query.category && req.query.category !== 'all') {
+                filters.category = ObjectId(req.query.category);
             }
 
             // &maxprice=price
@@ -75,14 +75,9 @@ module.exports = {
                         name: 1,
                         thumbnail: 1,
                         price: 1,
+                        stock: 1,
                         avgStars: { $avg: '$review.stars' },
                     },
-                },
-                {
-                    $skip: perPage * skip,
-                },
-                {
-                    $limit: perPage,
                 },
             ];
 
@@ -90,11 +85,14 @@ module.exports = {
                 aggregateQuery.push({ $sort: sort });
             }
 
-            const products = await Product.aggregate(aggregateQuery);
+            aggregateQuery.push({
+                $skip: perPage * skip,
+            });
+            aggregateQuery.push({
+                $limit: perPage,
+            });
 
-            if (products.length < 1) {
-                return sendErrorResponse(res, 404, 'No Products found');
-            }
+            const products = await Product.aggregate(aggregateQuery);
 
             const count = await Product.find(filters).sort(sort).count();
 
@@ -141,6 +139,14 @@ module.exports = {
                     },
                 },
                 {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'reviews.userId',
+                        foreignField: '_id',
+                        as: 'user',
+                    },
+                },
+                {
                     $project: {
                         name: 1,
                         thumbnail: 1,
@@ -151,7 +157,7 @@ module.exports = {
                         price: 1,
                         category: { $arrayElemAt: ['$category', 0] },
                         imagesPath: 1,
-                        reviews: 1,
+                        // reviews: 1,
                         totalReviews: { $size: '$reviews' },
                         avgStars: { $avg: '$reviews.stars' },
                     },

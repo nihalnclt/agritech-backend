@@ -7,25 +7,14 @@ module.exports = {
     createUser: async (req, res) => {
         try {
             const newUser = new User({ ...req.body, role: 'user' });
+            await newUser.save();
+
             const token = await newUser.generateAuthToken();
-            newUser.token = token;
-            await newUser
-                .save()
-                .then((response) => {
-                    res.status(201).json({ user: response, token });
-                })
-                .catch((err) => {
-                    // handling same email address error
-                    if (err.code === 11000) {
-                        return sendErrorResponse(
-                            res,
-                            400,
-                            'Email id already exists'
-                        );
-                    }
-                    sendErrorResponse(res, 400, err);
-                });
+            res.status(201).json({ user: newUser, token });
         } catch (err) {
+            if (err.code === 11000) {
+                return sendErrorResponse(res, 400, 'Email id already exists');
+            }
             sendErrorResponse(res, 500, err);
         }
     },
@@ -81,6 +70,14 @@ module.exports = {
             const totalUsers = await User.find(filters).count();
 
             res.status(200).json({ users, skip, usersPerPage, totalUsers });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    getUser: async (req, res) => {
+        try {
+            return res.status(200).json({ user: req.user, token: req.token });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
