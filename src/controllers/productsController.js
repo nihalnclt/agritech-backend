@@ -182,13 +182,15 @@ module.exports = {
                 return sendErrorResponse(res, 400, 'Invalid object id');
             }
 
-            const product = await Product.findByIdAndUpdate(id, req.body);
+            const product = await Product.findByIdAndUpdate(id, req.body, {
+                new: true,
+            });
 
             if (!product) {
                 return sendErrorResponse(res, 404, 'No products found');
             }
 
-            res.status(200).json({ message: 'product updated suucessfully' });
+            res.status(200).json(product);
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
