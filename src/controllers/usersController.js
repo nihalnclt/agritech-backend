@@ -60,7 +60,7 @@ module.exports = {
                 filters.fname = req.query.search;
             }
 
-            const usersPerPage = 1;
+            const usersPerPage = 12;
             const skip = parseInt(req.query.skip) || 0;
 
             const users = await User.find(filters)
@@ -103,6 +103,9 @@ module.exports = {
             await req.user.save();
             res.status(200).json(req.user);
         } catch (err) {
+            if (err.code === 11000) {
+                return sendErrorResponse(res, 400, 'Email id already exists');
+            }
             sendErrorResponse(res, 500, err);
         }
     },
