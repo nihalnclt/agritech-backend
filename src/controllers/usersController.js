@@ -51,12 +51,12 @@ module.exports = {
         }
     },
 
-    // https://localhost:500/api/v1/users?search=nihal&skip=3
+    // https://localhost:500/api/v1/users/all?search=nihal&skip=3
     getAllUsers: async (req, res) => {
         try {
             const filters = {};
 
-            if (req.query.search) {
+            if (req.query.search && req.query.search !== '') {
                 filters.fname = req.query.search;
             }
 
