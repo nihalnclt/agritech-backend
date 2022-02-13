@@ -60,7 +60,7 @@ module.exports = {
                 filters.fname = req.query.search;
             }
 
-            const usersPerPage = 12;
+            const usersPerPage = 1;
             const skip = parseInt(req.query.skip) || 0;
 
             const users = await User.find(filters)
