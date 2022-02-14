@@ -7,6 +7,7 @@ const postsRouter = require('./postsRouter');
 const commentsRouter = require('./commentsRouter');
 const postCategoriesRouter = require('./postCategoriesRouter');
 const addressRouter = require('./addressRouter');
+const ordersRouter = require('./ordersRouter');
 
 module.exports = {
     usersRouter,
@@ -18,4 +19,5 @@ module.exports = {
     commentsRouter,
     postCategoriesRouter,
     addressRouter,
+    ordersRouter,
 };

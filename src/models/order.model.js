@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const orderSchema = new Schema(
     {
-        user: {
+        userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
@@ -33,13 +33,26 @@ const orderSchema = new Schema(
         },
         orderStatus: {
             type: String,
+            lowercase: true,
             enum: ['ordered', 'packed', 'shipped', 'delivered'],
             default: 'ordered',
         },
         paymentType: {
             type: String,
-            enum: ['cod', 'card'],
             required: true,
+            lowercase: true,
+            enum: ['cod', 'card'],
+        },
+        razorpay: {
+            razorpayPaymentId: {
+                type: String,
+            },
+            razorpayOrderId: {
+                type: String,
+            },
+            razorpaySignature: {
+                type: String,
+            },
         },
     },
     { timestamps: true }
