@@ -138,4 +138,39 @@ module.exports = {
             sendErrorResponse(res, 500, err);
         }
     },
+    loginAsAdmin: async (req, res) => {
+        try {
+            if (!req.body.email || !req.body.password) {
+                return sendErrorResponse(
+                    res,
+                    400,
+                    'Email id and password is required'
+                );
+            }
+
+            const { email, password } = req.body;
+
+            const user = await User.findOne({ email: email });
+            if (!user) {
+                return sendErrorResponse(res, 400, 'Invalid email or password');
+            }
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return sendErrorResponse(res, 400, 'Invalid email or password');
+            }
+
+            if (user.role !== 'admin') {
+                return sendErrorResponse(res, 400, 'Admin access denied!.');
+            }
+
+            const token = await user.generateAuthToken();
+            user.token = token;
+            await user.save();
+
+            return res.status(200).json({ user, token });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
 };

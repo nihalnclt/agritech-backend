@@ -115,7 +115,6 @@ module.exports = {
                 return sendErrorResponse(res, 400, 'Invalid object id');
             }
 
-            // const product = await Product.findById(id).populate('category');
             const product = await Product.aggregate([
                 {
                     $match: {
