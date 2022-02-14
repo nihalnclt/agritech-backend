@@ -6,6 +6,7 @@ const Cart = require('./cart.model');
 const PostCategory = require('./postCategory.model');
 const Post = require('./post.model');
 const Comment = require('./comment.model');
+const Address = require('./address.model');
 
 module.exports = {
     User,
@@ -16,4 +17,5 @@ module.exports = {
     PostCategory,
     Post,
     Comment,
+    Address,
 };
