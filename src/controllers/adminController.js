@@ -56,16 +56,6 @@ module.exports = {
                 orderStatus: 'delivered',
             }).count();
 
-            const eachMonthSales = await Order.aggregate([
-                {
-                    $group: {
-                        _id: { $month: '$createdAt' },
-                        total: { $sum: '$totalAmount' },
-                        count: { $sum: 1 },
-                    },
-                },
-            ]);
-
             const topSellingCategories = await Order.aggregate([
                 {
                     $unwind: '$products',
@@ -79,24 +69,80 @@ module.exports = {
                     },
                 },
                 {
+                    $project: {
+                        products: 1,
+                        product: { $arrayElemAt: ['$product', 0] },
+                    },
+                },
+                {
                     $lookup: {
                         from: 'categories',
                         localField: 'product.category',
                         foreignField: '_id',
-                        as: 'category',
+                        as: 'product.category',
                     },
                 },
                 {
                     $project: {
-                        category: { $arrayElemAt: ['$category', 0] },
                         products: 1,
+                        product: {
+                            price: 1,
+                            category: {
+                                $arrayElemAt: ['$product.category', 0],
+                            },
+                        },
                     },
                 },
                 {
                     $group: {
-                        _id: '$category.name',
+                        _id: '$product.category.name',
+                        total: {
+                            $sum: {
+                                $multiply: [
+                                    '$product.price',
+                                    '$products.quantity',
+                                ],
+                            },
+                        },
+                    },
+                },
+                {
+                    $sort: { ordersCount: -1 },
+                },
+                {
+                    $limit: 6,
+                },
+            ]);
+
+            const topSellingProducts = await Order.aggregate([
+                {
+                    $unwind: '$products',
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'products.productId',
+                        foreignField: '_id',
+                        as: 'product',
+                    },
+                },
+                {
+                    $project: {
+                        products: 1,
+                        product: { $arrayElemAt: ['$product', 0] },
+                    },
+                },
+                {
+                    $group: {
+                        _id: '$product.name',
                         ordersCount: { $sum: '$products.quantity' },
                     },
+                },
+                {
+                    $sort: { ordersCount: -1 },
+                },
+                {
+                    $limit: 6,
                 },
             ]);
 
@@ -108,7 +154,7 @@ module.exports = {
                 totalUsers,
                 totalProducts,
                 totalDeliveredOreders,
-                eachMonthSales,
+                topSellingProducts,
                 topSellingCategories,
             });
         } catch (err) {
