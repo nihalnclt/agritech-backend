@@ -74,7 +74,17 @@ module.exports = {
 
     getAllCategories: async (req, res) => {
         try {
+            const filters = {};
+            const { search } = req.query;
+
+            if (search && search !== '') {
+                filters.name = { $regex: search, $options: 'i' };
+            }
+
             const categories = await Category.aggregate([
+                {
+                    $match: filters,
+                },
                 {
                     $lookup: {
                         from: 'products',

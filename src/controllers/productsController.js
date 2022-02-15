@@ -55,6 +55,10 @@ module.exports = {
                 filters.price = { $lt: parseInt(req.query.maxprice) };
             }
 
+            if (req.query.search && req.query.search !== '') {
+                filters.name = { $regex: req.query.search, $options: 'i' };
+            }
+
             const perPage = parseInt(req.query.limit) || 12;
             const skip = parseInt(req.query.skip) || 0;
 

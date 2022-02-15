@@ -98,9 +98,8 @@ module.exports = {
 
             if (createdAt && createdAt !== 'all') {
                 filters.createdAt = {
-                    $lte: new Date(
-                        new Date().getTime() -
-                            Number(createdAt) * 60 * 60 * 1000
+                    $gte: new Date(
+                        new Date().getTime() - Number(createdAt) * 24 * 60 * 60 * 1000
                     ).toISOString(),
                 };
             }

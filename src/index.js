@@ -14,6 +14,7 @@ const {
     postCategoriesRouter,
     addressRouter,
     ordersRouter,
+    adminRouter,
 } = require('./routes');
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/v1/comments', commentsRouter);
 app.use('/api/v1/post-categories', postCategoriesRouter);
 app.use('/api/v1/address', addressRouter);
 app.use('/api/v1/orders', ordersRouter);
+app.use('/api/v1/admin', adminRouter);
 
 app.listen(PORT, () => {
     console.log(`server is up on port ${PORT}`);
