@@ -57,7 +57,7 @@ module.exports = {
             const filters = {};
 
             if (req.query.search && req.query.search !== '') {
-                filters.fname = req.query.search;
+                filters.fname = { $regex: req.query.search, $options: 'i' };
             }
 
             const usersPerPage = 12;
