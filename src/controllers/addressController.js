@@ -11,7 +11,7 @@ module.exports = {
                     userId: req.user._id,
                 });
                 await newAddress.save();
-                return res.status(201).json(newAddress);
+                return res.status(201).json(newAddress._id);
             } else {
                 if (req.body?.userId || req.body?._id) {
                     return sendErrorResponse(
@@ -27,7 +27,7 @@ module.exports = {
                     req.body,
                     { new: true, runValidators: true }
                 );
-                return res.status(200).json(response);
+                return res.status(200).json(response._id);
             }
         } catch (err) {
             sendErrorResponse(res, 500, err);

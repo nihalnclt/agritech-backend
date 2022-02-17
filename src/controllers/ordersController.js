@@ -25,7 +25,7 @@ module.exports = {
 
             if (req.body.paymentType === 'card') {
                 const options = {
-                    amount: req.body.totalAmount,
+                    amount: Number(req.body.totalAmount) * 100,
                     currency: 'INR',
                 };
                 const order = await instance.orders.create(options);
@@ -42,6 +42,7 @@ module.exports = {
             await Cart.findOneAndRemove({ user: req.user._id });
             res.status(200).json(newOrder);
         } catch (err) {
+            console.log(err);
             sendErrorResponse(res, 500, err);
         }
     },
@@ -50,6 +51,14 @@ module.exports = {
         try {
             const { razorpayPaymentId, razorpayOrderId, razorpaySignature } =
                 req.body;
+
+            const products = await Cart.findOne({
+                user: req.user._id,
+            });
+            if (!products) {
+                return sendErrorResponse(res, 400, 'Your cart is empty');
+            }
+
             const newOrder = new Order({
                 ...req.body,
                 userId: req.user._id,
@@ -61,10 +70,12 @@ module.exports = {
                 },
             });
             await newOrder.save();
+            await Cart.findOneAndRemove({ user: req.user._id });
             res.status(200).json({
                 message: 'Payment was successfull',
             });
         } catch (err) {
+            console.log(err);
             sendErrorResponse(res, 500, err);
         }
     },
@@ -153,7 +164,9 @@ module.exports = {
 
     getSingleOrder: async (req, res) => {
         try {
-            const order = await Order.find({ _id: req.params.id });
+            const order = await Order.findOne({ _id: req.params.id })
+                .populate('address')
+                .populate('products.productId', 'name price');
             res.status(200).json(order);
         } catch (err) {
             sendErrorResponse(res, 500, err);
