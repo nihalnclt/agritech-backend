@@ -76,6 +76,7 @@ module.exports = {
                 { orderStatus: req.body.orderStatus },
                 { new: true, runValidators: true }
             );
+            console.log(req.body.orderStatus);
             if (!order) {
                 return sendErrorResponse(res, 400, 'order not found');
             }
@@ -88,7 +89,8 @@ module.exports = {
     getAllOrders: async (req, res) => {
         try {
             const limit = 12;
-            const { skip, status, createdAt, paymentType } = req.query;
+            const { status, createdAt, paymentType } = req.query;
+            const skip = parseInt(req.query.skip) || 0;
 
             const filters = {};
 
@@ -99,7 +101,8 @@ module.exports = {
             if (createdAt && createdAt !== 'all') {
                 filters.createdAt = {
                     $gte: new Date(
-                        new Date().getTime() - Number(createdAt) * 24 * 60 * 60 * 1000
+                        new Date().getTime() -
+                            Number(createdAt) * 24 * 60 * 60 * 1000
                     ).toISOString(),
                 };
             }
@@ -120,7 +123,10 @@ module.exports = {
                 .limit(limit)
                 .skip(skip ? limit * skip : 0)
                 .sort({ _id: -1 });
-            res.status(200).json(orders);
+
+            const totalOrders = await Order.find(filters).count();
+
+            res.status(200).json({ orders, totalOrders, skip, limit });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
