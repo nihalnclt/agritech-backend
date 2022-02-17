@@ -33,4 +33,13 @@ module.exports = {
             sendErrorResponse(res, 500, err);
         }
     },
+
+    getAddress: async (req, res) => {
+        try {
+            const address = await Address.findOne({ userId: req.user._id });
+            res.status(200).send(address);
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
 };
