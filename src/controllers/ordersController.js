@@ -71,9 +71,7 @@ module.exports = {
             });
             await newOrder.save();
             await Cart.findOneAndRemove({ user: req.user._id });
-            res.status(200).json({
-                message: 'Payment was successfull',
-            });
+            res.status(200).json(newOrder);
         } catch (err) {
             console.log(err);
             sendErrorResponse(res, 500, err);
