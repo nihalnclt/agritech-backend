@@ -160,6 +160,20 @@ module.exports = {
         }
     },
 
+    getMyOrders: async (req, res) => {
+        try {
+            const orders = await Order.find({ userId: req.user._id }).select({
+                paymentType: 1,
+                totalAmount: 1,
+                orderStatus: 1,
+                createdAt: 1,
+            });
+            res.status(200).json(orders);
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
     getSingleOrder: async (req, res) => {
         try {
             const order = await Order.findOne({ _id: req.params.id })
