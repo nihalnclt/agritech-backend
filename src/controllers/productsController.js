@@ -43,7 +43,24 @@ module.exports = {
 
             // &category=categoryname
             if (req.query.category && req.query.category !== 'all') {
-                filters.category = req.query.category;
+                // console.log(checkValidObjectId(req.query.category))
+                if (checkValidObjectId(req.query.category)) {
+                    filters.category = ObjectId(req.query.category);
+                } else {
+                    const category = await Category.findOne({
+                        name: req.query.category,
+                    });
+                    if (category) {
+                        filters.category = category._id;
+                    } else {
+                        return res.status(200).json({
+                            products: [],
+                            totalProducts: 0,
+                            limit: 12,
+                            skip: 0,
+                        });
+                    }
+                }
             }
 
             // &maxprice=price
