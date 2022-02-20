@@ -43,7 +43,7 @@ module.exports = {
 
             // &category=categoryname
             if (req.query.category && req.query.category !== 'all') {
-                filters.category = ObjectId(req.query.category);
+                filters.category = req.query.category;
             }
 
             // &maxprice=price
