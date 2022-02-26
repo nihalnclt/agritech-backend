@@ -101,6 +101,7 @@ module.exports = {
                         name: 1,
                         icon: 1,
                         count: { $size: '$products' },
+                        creator: 1,
                     },
                 },
                 {
