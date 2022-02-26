@@ -177,10 +177,11 @@ module.exports = {
 
     updateRole: async (req, res) => {
         try {
-            await User.findOneAndUpdate(
-                { _id: req.params._id },
-                { role: req.body?.role || 'user' }
-            );
+            // console.log(req.body);
+            // await User.findOneAndUpdate(
+            //     { _id: req.params.id },
+            //     { role: req.body?.role || 'user' }
+            // );
 
             res.status(200).json({ message: 'user role updated successfully' });
         } catch (err) {

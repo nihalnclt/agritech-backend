@@ -19,7 +19,7 @@ router.post('', createUser);
 router.post('/login', loginUser);
 router.post('/admin-login', loginAsAdmin);
 router.patch('/', auth, updateUser);
-router.patch('/:id', isSuperAdmin, updateRole);
+router.patch('/:id', auth, isSuperAdmin, updateRole);
 router.delete('/', auth, deleteOwnAccount);
 router.delete('/:id', auth, isSuperAdmin, deleteUser);
 
