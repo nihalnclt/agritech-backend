@@ -46,6 +46,11 @@ const productSchema = new Schema({
             type: String,
         },
     ],
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
 });
 
 // deleting reviews that is related to removed product

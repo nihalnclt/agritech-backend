@@ -6,7 +6,10 @@ const { Product, Category } = require('../models');
 module.exports = {
     addProduct: async (req, res) => {
         try {
-            const newProduct = new Product(req.body);
+            const newProduct = new Product({
+                ...req.body,
+                creator: req.user._id,
+            });
             await newProduct
                 .save()
                 .then((response) => {
@@ -28,7 +31,7 @@ module.exports = {
         }
     },
 
-    // - /products?skip=3&limit=10&sort=price:desc&category=fruits&maxprice=1000
+    // - /products?skip=3&limit=10&sort=price:desc&category=fruits&maxprice=1000&creator=id
     getAllProducts: async (req, res) => {
         try {
             const sort = {};
@@ -76,6 +79,10 @@ module.exports = {
                 filters.name = { $regex: req.query.search, $options: 'i' };
             }
 
+            if (req.query.creator && req.query.creator !== '') {
+                filters.creator = ObjectId(req.query.creator);
+            }
+
             const perPage = parseInt(req.query.limit) || 12;
             const skip = parseInt(req.query.skip) || 0;
 
@@ -98,6 +105,7 @@ module.exports = {
                         price: 1,
                         stock: 1,
                         avgStars: { $avg: '$review.stars' },
+                        creator: 1,
                     },
                 },
             ];

@@ -2,7 +2,7 @@ const { sendErrorResponse } = require('../helpers');
 
 const isAdmin = (req, res, next) => {
     try {
-        if (req.user.role !== 'admin') {
+        if (req.user.role !== 'admin' && req.user.role !== 'super-admin') {
             return sendErrorResponse(res, 400, 'Admin access denied');
         }
         next();

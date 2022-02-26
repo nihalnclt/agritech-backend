@@ -120,6 +120,66 @@ module.exports = {
                 filters.paymentType = paymentType;
             }
 
+            // getting specific creator orders
+            if (req.user.role === 'admin') {
+                const orders = await Order.aggregate([
+                    {
+                        $unwind: '$products',
+                    },
+                    {
+                        $lookup: {
+                            from: 'products',
+                            localField: 'products.productId',
+                            foreignField: '_id',
+                            as: 'product',
+                        },
+                    },
+                    {
+                        $project: {
+                            product: { $arrayElemAt: ['$product', 0] },
+                            paymentType: 1,
+                            totalAmount: 1,
+                            orderStatus: 1,
+                            createdAt: 1,
+                            address: 1,
+                        },
+                    },
+                    {
+                        $match: {
+                            'product.creator': req.user._id,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'addresses',
+                            localField: 'address',
+                            foreignField: '_id',
+                            as: 'address',
+                        },
+                    },
+                    {
+                        $project: {
+                            address: { $arrayElemAt: ['$address', 0] },
+                            paymentType: 1,
+                            totalAmount: 1,
+                            orderStatus: 1,
+                            createdAt: 1,
+                        },
+                    },
+                    {
+                        $project: {
+                            address: { phone: 1, city: 1 },
+                            paymentType: 1,
+                            totalAmount: 1,
+                            orderStatus: 1,
+                            createdAt: 1,
+                        },
+                    },
+                ]);
+                return res.status(200).json({ orders });
+            }
+
+            // getting all orders
             const orders = await Order.find(filters)
                 .populate('address', 'phone city')
                 .select({

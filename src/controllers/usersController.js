@@ -138,6 +138,7 @@ module.exports = {
             sendErrorResponse(res, 500, err);
         }
     },
+
     loginAsAdmin: async (req, res) => {
         try {
             if (!req.body.email || !req.body.password) {
@@ -169,6 +170,19 @@ module.exports = {
             await user.save();
 
             return res.status(200).json({ user, token });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    updateRole: async (req, res) => {
+        try {
+            await User.findOneAndUpdate(
+                { _id: req.params._id },
+                { role: req.body?.role || 'user' }
+            );
+
+            res.status(200).json({ message: 'user role updated successfully' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

@@ -9,16 +9,18 @@ const {
     deleteUser,
     getUser,
     loginAsAdmin,
+    updateRole,
 } = require('../controllers/usersController');
-const { auth, isAdmin } = require('../middlewares');
+const { auth, isSuperAdmin } = require('../middlewares');
 
 router.get('', auth, getUser);
-router.get('/all', auth, isAdmin, getAllUsers);
+router.get('/all', auth, isSuperAdmin, getAllUsers);
 router.post('', createUser);
 router.post('/login', loginUser);
 router.post('/admin-login', loginAsAdmin);
 router.patch('/', auth, updateUser);
+router.patch('/:id', isSuperAdmin, updateRole);
 router.delete('/', auth, deleteOwnAccount);
-router.delete('/:id', auth, isAdmin, deleteUser);
+router.delete('/:id', auth, isSuperAdmin, deleteUser);
 
 module.exports = router;
