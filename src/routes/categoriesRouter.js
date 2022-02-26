@@ -6,11 +6,11 @@ const {
     deleteCategory,
     getAllCategories,
 } = require('../controllers/categoriesController');
-const { auth, isSuperAdmin } = require('../middlewares');
+const { auth, isSuperAdmin, isAdmin } = require('../middlewares');
 
-router.post('', auth, isSuperAdmin, addCategory);
+router.post('', auth, isAdmin, addCategory);
 router.get('', getAllCategories);
-router.patch('/:id', auth, isSuperAdmin, updateCategory);
-router.delete('/:id', auth, isSuperAdmin, deleteCategory);
+router.patch('/:id', auth, isAdmin, updateCategory);
+router.delete('/:id', auth, isAdmin, deleteCategory);
 
 module.exports = router;

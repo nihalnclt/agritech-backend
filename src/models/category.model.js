@@ -14,6 +14,11 @@ const categorySchema = new Schema({
         type: String,
         trim: true,
     },
+    creator: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
 });
 
 const Category = mongoose.model('Category', categorySchema);

@@ -4,7 +4,10 @@ const { sendErrorResponse, checkValidObjectId } = require('../helpers');
 module.exports = {
     addCategory: async (req, res) => {
         try {
-            const newCategory = new Category(req.body);
+            const newCategory = new Category({
+                ...req.body,
+                creator: req.user._id,
+            });
             await newCategory
                 .save()
                 .then((response) => {
