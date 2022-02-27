@@ -21,8 +21,10 @@ module.exports = {
 
     getAllPosts: async (req, res) => {
         try {
-            const { skip, category } = req.query;
+            const { category } = req.query;
             const limit = 12;
+
+            const skip = parseInt(req.query.skip) || 0;
 
             const filters = {};
 
@@ -31,7 +33,9 @@ module.exports = {
                     name: category,
                 });
                 if (!myCategory) {
-                    return res.status(200).json([]);
+                    return res
+                        .status(200)
+                        .json({ posts: [], skip: 0, limit: 0, totalPosts: 0 });
                 }
                 filters.category = myCategory._id;
             }
@@ -44,7 +48,9 @@ module.exports = {
                 .skip(skip ? limit * skip : 0)
                 .select({ body: 0 });
 
-            res.status(200).json(posts);
+            const totalPosts = await Post.find(filters).count();
+
+            res.status(200).json({ posts, skip, limit, totalPosts });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
