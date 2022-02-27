@@ -18,11 +18,6 @@ const postSchema = new mongoose.Schema(
             ref: 'PostCategory',
             required: true,
         },
-        description: {
-            type: String,
-            trim: true,
-            required: true,
-        },
         thumbnail: {
             type: String,
             required: true,
