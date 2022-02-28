@@ -22,7 +22,7 @@ module.exports = {
     getAllPosts: async (req, res) => {
         try {
             const { category } = req.query;
-            const limit = 12;
+            const limit = req.query.limit || 12;
 
             const skip = parseInt(req.query.skip) || 0;
 
@@ -40,15 +40,24 @@ module.exports = {
                 filters.category = myCategory._id;
             }
 
-            const posts = await Post.find(filters)
+            let posts = await Post.find(filters)
                 .lean()
                 .populate('category')
                 .populate('numComments')
                 .limit(limit)
-                .skip(skip ? limit * skip : 0)
-                .select({ body: 0 });
+                .skip(skip ? limit * skip : 0);
 
             const totalPosts = await Post.find(filters).count();
+
+            posts = posts.map((post) => {
+                return {
+                    ...post,
+                    body: post.body
+                        .replace(/<\/?[^>]+(>|$)/g, '')
+                        .trim()
+                        .slice(0, 130),
+                };
+            });
 
             res.status(200).json({ posts, skip, limit, totalPosts });
         } catch (err) {
@@ -66,10 +75,25 @@ module.exports = {
                 .populate('category')
                 .populate({ path: 'comments' })
                 .exec();
+
             if (!post) {
                 return sendErrorResponse(res, 404, 'No posts found');
             }
-            res.status(200).json({ post, comments: post.comments });
+
+            const nextPost = await Post.findOne({
+                _id: { $gt: req.params.id },
+            }).select('title');
+
+            const prevPost = await Post.findOne({
+                _id: { $lt: req.params.id },
+            }).select('title');
+
+            res.status(200).json({
+                post,
+                comments: post.comments,
+                nextPost,
+                prevPost,
+            });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }

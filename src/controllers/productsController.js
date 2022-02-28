@@ -169,7 +169,7 @@ module.exports = {
                 {
                     $lookup: {
                         from: 'users',
-                        localField: 'reviews.userId',
+                        localField: 'creator',
                         foreignField: '_id',
                         as: 'user',
                     },
@@ -185,9 +185,27 @@ module.exports = {
                         price: 1,
                         category: { $arrayElemAt: ['$category', 0] },
                         imagesPath: 1,
-                        // reviews: 1,
                         totalReviews: { $size: '$reviews' },
                         avgStars: { $avg: '$reviews.stars' },
+                        user: { $arrayElemAt: ['$user', 0] },
+                    },
+                },
+                {
+                    $project: {
+                        name: 1,
+                        thumbnail: 1,
+                        shortDescription: 1,
+                        stock: 1,
+                        unit: 1,
+                        description: 1,
+                        price: 1,
+                        category: 1,
+                        imagesPath: 1,
+                        totalReviews: 1,
+                        avgStars: 1,
+                        user: {
+                            fname: 1,
+                        },
                     },
                 },
             ]);
