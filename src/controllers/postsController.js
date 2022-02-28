@@ -1,5 +1,5 @@
 const { sendErrorResponse, checkValidObjectId } = require('../helpers');
-const { PostCategory } = require('../models');
+const { PostCategory, Comment } = require('../models');
 const Post = require('../models/post.model');
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
 
     getAllPosts: async (req, res) => {
         try {
-            const { category } = req.query;
+            const { category, search } = req.query;
             const limit = req.query.limit || 12;
 
             const skip = parseInt(req.query.skip) || 0;
@@ -40,11 +40,16 @@ module.exports = {
                 filters.category = myCategory._id;
             }
 
+            if (search && search !== '') {
+                filters.title = { $regex: req.query.search, $options: 'i' };
+            }
+
             let posts = await Post.find(filters)
                 .lean()
                 .populate('category')
                 .populate('numComments')
                 .limit(limit)
+                .sort({ _id: -1 })
                 .skip(skip ? limit * skip : 0);
 
             const totalPosts = await Post.find(filters).count();
@@ -54,7 +59,7 @@ module.exports = {
                     ...post,
                     body: post.body
                         .replace(/<\/?[^>]+(>|$)/g, '')
-                        .replace('&nbsp;', ' ')
+                        .replaceAll('&nbsp;', ' ')
                         .trim()
                         .slice(0, 130),
                 };
@@ -74,12 +79,15 @@ module.exports = {
 
             const post = await Post.findOne({ _id: req.params.id })
                 .populate('category')
-                .populate({ path: 'comments' })
                 .exec();
 
             if (!post) {
                 return sendErrorResponse(res, 404, 'No posts found');
             }
+
+            const comments = await Comment.find({
+                postId: req.params.id,
+            }).populate('userId', 'fname avatar');
 
             const nextPost = await Post.findOne({
                 _id: { $gt: req.params.id },
@@ -91,7 +99,7 @@ module.exports = {
 
             res.status(200).json({
                 post,
-                comments: post.comments,
+                comments,
                 nextPost,
                 prevPost,
             });
