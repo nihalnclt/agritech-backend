@@ -54,6 +54,7 @@ module.exports = {
                     ...post,
                     body: post.body
                         .replace(/<\/?[^>]+(>|$)/g, '')
+                        .replace('&nbsp;', ' ')
                         .trim()
                         .slice(0, 130),
                 };
