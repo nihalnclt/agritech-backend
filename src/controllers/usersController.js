@@ -6,7 +6,7 @@ const { User } = require('../models');
 module.exports = {
     createUser: async (req, res) => {
         try {
-            const newUser = new User({ ...req.body, role: 'user' });
+            const newUser = new User({ ...req.body });
             await newUser.save();
 
             const token = await newUser.generateAuthToken();
