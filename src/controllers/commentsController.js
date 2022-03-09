@@ -1,5 +1,5 @@
 const { sendErrorResponse } = require('../helpers');
-const Comment = require('../models/comment.model');
+const { Comment } = require('../models');
 
 module.exports = {
     addComment: (req, res) => {

@@ -1,6 +1,5 @@
 const { sendErrorResponse, checkValidObjectId } = require('../helpers');
-const { PostCategory, Comment } = require('../models');
-const Post = require('../models/post.model');
+const { PostCategory, Comment, Post } = require('../models');
 
 module.exports = {
     addPost: async (req, res) => {

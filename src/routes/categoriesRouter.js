@@ -6,7 +6,7 @@ const {
     deleteCategory,
     getAllCategories,
 } = require('../controllers/categoriesController');
-const { auth, isSuperAdmin, isAdmin } = require('../middlewares');
+const { auth, isAdmin } = require('../middlewares');
 
 router.post('', auth, isAdmin, addCategory);
 router.get('', getAllCategories);
