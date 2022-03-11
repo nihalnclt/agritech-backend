@@ -51,6 +51,9 @@ const userSchema = new Schema({
     token: {
         type: String,
     },
+    resetPasswordToken: {
+        type: String,
+    },
 });
 
 userSchema.methods.toJSON = function () {

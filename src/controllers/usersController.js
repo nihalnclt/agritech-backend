@@ -1,6 +1,11 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
-const { sendErrorResponse, checkValidObjectId } = require('../helpers');
+const {
+    sendErrorResponse,
+    checkValidObjectId,
+    sendEmail,
+} = require('../helpers');
 const { User } = require('../models');
 
 module.exports = {
@@ -183,6 +188,71 @@ module.exports = {
             );
 
             res.status(200).json({ message: 'user role updated successfully' });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    sendEmailAddress: async (req, res) => {
+        try {
+            if (!req.body.email) {
+                return sendErrorResponse(res, 400, 'E-mail must be provided');
+            }
+
+            const { email } = req.body;
+            const user = await User.findOne({ email: email });
+
+            if (!user) {
+                return sendErrorResponse(
+                    res,
+                    400,
+                    "user with given email doesn't exist"
+                );
+            }
+
+            user.resetPasswordToken = crypto.randomBytes(32).toString('hex');
+            await user.save();
+
+            const link = `https://zealous-snyder-7f3261.netlify.app/my-account/reset-password/${user._id}/${user.resetPasswordToken}`;
+            await sendEmail(user.email, 'Password reset', link);
+
+            res.status(200).json({
+                message: 'password reset link sent to your email account',
+            });
+        } catch (err) {
+            sendErrorResponse(res, 500, err);
+        }
+    },
+
+    changePassword: async (req, res) => {
+        try {
+            const { password, userId, token } = req.body;
+            if (!password || !userId || !token) {
+                return sendErrorResponse(
+                    res,
+                    400,
+                    'Password, userId, and token required.'
+                );
+            }
+
+            const user = await User.findById(userId);
+            if (!user) {
+                return sendErrorResponse(
+                    res,
+                    400,
+                    "user with given id doesn't exist"
+                );
+            }
+
+            if (!user?.resetPasswordToken || user.resetPasswordToken !== token) {
+                return sendErrorResponse(res, 400, 'Invalid link or expired');
+            }
+
+            user.password = password;
+            user.resetPasswordToken = '';
+            await user.save();
+
+            res.status(200).json({ message: 'password changed successfully' });
         } catch (err) {
             sendErrorResponse(res, 500, err);
         }
