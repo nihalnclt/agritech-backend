@@ -22,6 +22,9 @@ const postSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        youtubeLink: {
+            type: String,
+        },
     },
     {
         timestamps: true,
