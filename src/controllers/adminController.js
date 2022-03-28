@@ -77,6 +77,7 @@ module.exports = {
                     },
                     {
                         $project: {
+                            products: 1,
                             product: { $arrayElemAt: ['$product', 0] },
                             createdAt: 1,
                             totalAmount: 1,
@@ -96,7 +97,14 @@ module.exports = {
                     {
                         $group: {
                             _id: null,
-                            total: { $sum: '$totalAmount' },
+                            total: {
+                                $sum: {
+                                    $multiply: [
+                                        '$product.price',
+                                        '$products.quantity',
+                                    ],
+                                },
+                            },
                         },
                     },
                 ]);
@@ -115,6 +123,7 @@ module.exports = {
                     },
                     {
                         $project: {
+                            products: 1,
                             product: { $arrayElemAt: ['$product', 0] },
                             createdAt: 1,
                             totalAmount: 1,
@@ -134,7 +143,14 @@ module.exports = {
                     {
                         $group: {
                             _id: null,
-                            total: { $sum: '$totalAmount' },
+                            total: {
+                                $sum: {
+                                    $multiply: [
+                                        '$product.price',
+                                        '$products.quantity',
+                                    ],
+                                },
+                            },
                         },
                     },
                 ]);
@@ -153,6 +169,7 @@ module.exports = {
                     },
                     {
                         $project: {
+                            products: 1,
                             product: { $arrayElemAt: ['$product', 0] },
                             createdAt: 1,
                             totalAmount: 1,
@@ -166,7 +183,14 @@ module.exports = {
                     {
                         $group: {
                             _id: null,
-                            total: { $sum: '$totalAmount' },
+                            total: {
+                                $sum: {
+                                    $multiply: [
+                                        '$product.price',
+                                        '$products.quantity',
+                                    ],
+                                },
+                            },
                         },
                     },
                 ]);
@@ -281,7 +305,7 @@ module.exports = {
                 });
             }
 
-            // super-admin data
+            // Fetching super-admin data
             const oneDayOrder = await Order.aggregate([
                 {
                     $match: {

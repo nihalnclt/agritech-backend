@@ -136,6 +136,7 @@ module.exports = {
                     },
                     {
                         $project: {
+                            products: 1,
                             product: { $arrayElemAt: ['$product', 0] },
                             paymentType: 1,
                             totalAmount: 1,
@@ -160,7 +161,8 @@ module.exports = {
                     {
                         $project: {
                             address: { $arrayElemAt: ['$address', 0] },
-                            paymentType: 1,
+                            products: 1,
+                            product: 1,
                             totalAmount: 1,
                             orderStatus: 1,
                             createdAt: 1,
@@ -170,7 +172,12 @@ module.exports = {
                         $project: {
                             address: { phone: 1, city: 1 },
                             paymentType: 1,
-                            totalAmount: 1,
+                            totalAmount: {
+                                $multiply: [
+                                    '$products.quantity',
+                                    '$product.price',
+                                ],
+                            },
                             orderStatus: 1,
                             createdAt: 1,
                         },
@@ -179,7 +186,7 @@ module.exports = {
                 return res.status(200).json({ orders });
             }
 
-            // getting all orders
+            // getting all orders for super-admin
             const orders = await Order.find(filters)
                 .populate('address', 'phone city')
                 .select({
